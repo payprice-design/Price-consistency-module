@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wireframe Image Gallery</title>
+  <style>
+    :root {
+      --page-bg: #cfcfcf;
+      --card-bg: rgba(255, 255, 255, 0.3);
+      --text: #1a1a1a;
+      --btn-bg: #ffffff;
+      --btn-border: #d0d0d0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 40px 24px;
+      background: var(--page-bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+    }
+
+    .gallery {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: safe center;
+      align-items: center;
+      gap: 48px;
+      width: 100%;
+      margin: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      width: 330px;
+      flex: 0 0 auto;
+    }
+
+    .column__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 15px 3px;
+    }
+
+    .column__title {
+      font-size: 14px;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      font-size: 16px;
+      line-height: 1;
+      color: #777;
+      padding: 2px 4px;
+      border-radius: 4px;
+      -webkit-user-select: none;
+      user-select: none;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .drag-handle:hover {
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--text);
+    }
+
+    .column.dragging {
+      opacity: 0.4;
+    }
+
+    .column.drag-over {
+      outline: 2px dashed #888;
+      outline-offset: 6px;
+      border-radius: 8px;
+    }
+
+    .card {
+      background: transparent;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .card__img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 24px;
+    }
+
+    .nav-btn {
+      width: 51px;
+      height: 51px;
+      border-radius: 50%;
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--text);
+      flex: 0 0 auto;
+      transition: background 0.15s ease, transform 0.1s ease;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .nav-btn:hover {
+      background: #f2f2f2;
+    }
+
+    .nav-btn:active {
+      transform: scale(0.92);
+    }
+
+    .file-name {
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+      flex: 1 1 auto;
+      padding: 0 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .breakdown {
+      width: 100%;
+      margin: 72px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .breakdown__title {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 8px 3px;
+    }
+
+    .flow-section {
+      background: var(--card-bg);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .flow-section__summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .flow-section__summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .flow-section__chevron {
+      font-size: 14px;
+      transition: transform 0.2s ease;
+    }
+
+    .flow-section[open] .flow-section__chevron {
+      transform: rotate(180deg);
+    }
+
+    .flow-section__count {
+      font-weight: 400;
+      font-size: 13px;
+      color: #555;
+      margin-left: 8px;
+    }
+
+    .screens-grid {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      gap: 20px;
+      padding: 4px 20px 24px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .screen {
+      margin: 0;
+      flex: 0 0 auto;
+      width: 220px;
+    }
+
+    .screen__img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .screen__label {
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 760px) {
+      .column {
+        width: 100%;
+        max-width: 480px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery" id="gallery"></div>
+
+  <section class="breakdown" id="breakdown">
+    <h2 class="breakdown__title">Screen-by-screen breakdown</h2>
+  </section>
+
+  <!-- Optional baked manifest for offline use (generate with generate_manifest.py).
+       Missing file is fine: the page falls back to the dev server or probing. -->
+  <script src="manifest.js" onerror="window.__manifestMissing = true;"></script>
+
+  <script>
+    const extensions = ["PNG", "png", "jpg", "jpeg", "JPG", "JPEG", "webp"];
+
+    const gallery = document.getElementById("gallery");
+    const breakdown = document.getElementById("breakdown");
+
+    // Tracks which column is currently being dragged for reordering.
+    let draggedColumn = null;
+
+    // Swap the positions of two columns in the comparison row.
+    function swapColumns(a, b) {
+      if (a === b) return;
+      const columns = Array.from(gallery.children);
+      const aIndex = columns.indexOf(a);
+      const bIndex = columns.indexOf(b);
+      if (aIndex < 0 || bIndex < 0) return;
+      const aNext = a.nextElementSibling;
+      const bNext = b.nextElementSibling;
+      if (aNext === b) {
+        gallery.insertBefore(b, a);
+      } else if (bNext === a) {
+        gallery.insertBefore(a, b);
+      } else {
+        gallery.insertBefore(a, bNext);
+        gallery.insertBefore(b, aNext);
+      }
+    }
+
+    function tryLoad(url) {
+      return new Promise((resolve) => {
+        const probe = new Image();
+        probe.onload = () => resolve(true);
+        probe.onerror = () => resolve(false);
+        probe.src = url;
+      });
+    }
+
+    // Fallback discovery (used only when the manifest endpoint is unavailable,
+    // e.g. the page is opened without server.py). Requires a known folder list.
+    const FALLBACK_FOLDERS = ["Flow 1", "Flow 2", "Flow 3", "Flow 4"];
+    const MAX_IMAGE_NUMBER = 100;
+
+    async function findFile(folder, n) {
+      for (const ext of extensions) {
+        const file = n + "." + ext;
+        if (await tryLoad(imgUrl(folder, file))) return file;
+      }
+      return null;
+    }
+
+    async function discoverFilesByProbing(folder) {
+      const results = await Promise.all(
+        Array.from({ length: MAX_IMAGE_NUMBER }, (_, i) => findFile(folder, i + 1))
+      );
+      return results.filter(Boolean);
+    }
+
+    function flowsFromManifest(data) {
+      return data.folders.map((f) => ({
+        title: f.name,
+        folder: f.name,
+        files: f.images,
+      }));
+    }
+
+    const SERVED_OVER_HTTP = location.protocol === "http:" || location.protocol === "https:";
+
+    function bakedFlows() {
+      if (window.FLOW_MANIFEST && window.FLOW_MANIFEST.folders) {
+        return flowsFromManifest(window.FLOW_MANIFEST);
+      }
+      return null;
+    }
+
+    async function liveFlows() {
+      const res = await fetch("/api/manifest?t=" + Date.now());
+      if (!res.ok) throw new Error("no manifest");
+      return flowsFromManifest(await res.json());
+    }
+
+    async function probedFlows() {
+      const flows = [];
+      for (const folder of FALLBACK_FOLDERS) {
+        flows.push({ title: folder, folder, files: await discoverFilesByProbing(folder) });
+      }
+      return flows;
+    }
+
+    // When served by the dev server (http), always use the LIVE manifest so
+    // renames/additions are picked up instantly. The baked manifest.js is only
+    // for offline use (file://), where it's the only option.
+    async function getFlows() {
+      if (SERVED_OVER_HTTP) {
+        try {
+          return await liveFlows();
+        } catch (e) {
+          return bakedFlows() || (await probedFlows());
+        }
+      }
+      return bakedFlows() || (await probedFlows());
+    }
+
+    // Cache-busting only helps when served over http(s); a query string on a
+    // file:// URL breaks image loading, so skip it when opened offline.
+    const CACHE_BUST = SERVED_OVER_HTTP;
+
+    function imgUrl(folder, file) {
+      const base = encodeURIComponent(folder) + "/" + encodeURIComponent(file);
+      return CACHE_BUST ? base + "?t=" + Date.now() : base;
+    }
+
+    function buildFlow(flow) {
+      let index = 0;
+      const files = flow.files || [];
+
+      const column = document.createElement("div");
+      column.className = "column";
+
+      const header = document.createElement("div");
+      header.className = "column__header";
+
+      const handle = document.createElement("span");
+      handle.className = "drag-handle";
+      handle.textContent = "\u2630";
+      handle.title = "Drag to reorder";
+      handle.setAttribute("aria-label", "Drag to reorder");
+
+      const title = document.createElement("h2");
+      title.className = "column__title";
+      title.textContent = flow.title;
+
+      header.appendChild(handle);
+      header.appendChild(title);
+
+      // Enable drag-and-drop reordering, but only when started from the handle
+      // (so image drags and button clicks aren't affected).
+      handle.addEventListener("mousedown", () => { column.draggable = true; });
+      handle.addEventListener("mouseup", () => { column.draggable = false; });
+      column.addEventListener("dragstart", (e) => {
+        draggedColumn = column;
+        column.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+      });
+      column.addEventListener("dragend", () => {
+        column.draggable = false;
+        column.classList.remove("dragging");
+        document.querySelectorAll(".column.drag-over").forEach((c) => c.classList.remove("drag-over"));
+      });
+      column.addEventListener("dragover", (e) => {
+        if (!draggedColumn || draggedColumn === column) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+      });
+      column.addEventListener("dragenter", (e) => {
+        if (!draggedColumn || draggedColumn === column) return;
+        e.preventDefault();
+        column.classList.add("drag-over");
+      });
+      column.addEventListener("dragleave", () => {
+        column.classList.remove("drag-over");
+      });
+      column.addEventListener("drop", (e) => {
+        e.preventDefault();
+        column.classList.remove("drag-over");
+        if (!draggedColumn || draggedColumn === column) return;
+        swapColumns(draggedColumn, column);
+      });
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const img = document.createElement("img");
+      img.className = "card__img";
+      img.alt = flow.title;
+      card.appendChild(img);
+
+      const controls = document.createElement("div");
+      controls.className = "controls";
+
+      const prevBtn = document.createElement("button");
+      prevBtn.className = "nav-btn";
+      prevBtn.type = "button";
+      prevBtn.setAttribute("aria-label", "Previous image");
+      prevBtn.textContent = "\u2039";
+
+      const fileName = document.createElement("div");
+      fileName.className = "file-name";
+
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "nav-btn";
+      nextBtn.type = "button";
+      nextBtn.setAttribute("aria-label", "Next image");
+      nextBtn.textContent = "\u203A";
+
+      function render() {
+        if (!files.length) {
+          fileName.textContent = "No images";
+          return;
+        }
+        const file = files[index];
+        img.src = imgUrl(flow.folder, file);
+        fileName.textContent = file;
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (!files.length) return;
+        index = (index - 1 + files.length) % files.length;
+        render();
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (!files.length) return;
+        index = (index + 1) % files.length;
+        render();
+      });
+
+      controls.appendChild(prevBtn);
+      controls.appendChild(fileName);
+      controls.appendChild(nextBtn);
+
+      column.appendChild(header);
+      column.appendChild(card);
+      column.appendChild(controls);
+      gallery.appendChild(column);
+
+      // Collapsible section for this flow, showing every screen.
+      const section = document.createElement("details");
+      section.className = "flow-section";
+
+      const summary = document.createElement("summary");
+      summary.className = "flow-section__summary";
+
+      const summaryLabel = document.createElement("span");
+      summaryLabel.textContent = flow.title;
+
+      const count = document.createElement("span");
+      count.className = "flow-section__count";
+      count.textContent = files.length + (files.length === 1 ? " screen" : " screens");
+
+      const chevron = document.createElement("span");
+      chevron.className = "flow-section__chevron";
+      chevron.textContent = "\u25BC";
+
+      const summaryLeft = document.createElement("span");
+      summaryLeft.appendChild(summaryLabel);
+      summaryLeft.appendChild(count);
+
+      summary.appendChild(summaryLeft);
+      summary.appendChild(chevron);
+
+      const screensGrid = document.createElement("div");
+      screensGrid.className = "screens-grid";
+
+      section.appendChild(summary);
+      section.appendChild(screensGrid);
+      breakdown.appendChild(section);
+
+      files.forEach((file) => {
+        const figure = document.createElement("figure");
+        figure.className = "screen";
+
+        const screenImg = document.createElement("img");
+        screenImg.className = "screen__img";
+        screenImg.loading = "lazy";
+        screenImg.alt = flow.title + " - " + file;
+        screenImg.src = imgUrl(flow.folder, file);
+
+        const label = document.createElement("figcaption");
+        label.className = "screen__label";
+        label.textContent = file;
+
+        figure.appendChild(screenImg);
+        figure.appendChild(label);
+        screensGrid.appendChild(figure);
+      });
+
+      render();
+    }
+
+    (async () => {
+      const flows = await getFlows();
+      flows.forEach(buildFlow);
+    })();
+  </script>
+</body>
+</html>
