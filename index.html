@@ -25,6 +25,27 @@
       color: var(--text);
     }
 
+    .last-updated {
+      position: fixed;
+      top: 12px;
+      right: 16px;
+      z-index: 10;
+      font-size: 11px;
+      font-weight: 500;
+      color: #555;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--btn-border);
+      border-radius: 999px;
+      padding: 5px 12px;
+      -webkit-user-select: none;
+      user-select: none;
+      backdrop-filter: blur(4px);
+    }
+
+    .last-updated:empty {
+      display: none;
+    }
+
     .gallery {
       display: flex;
       flex-wrap: nowrap;
@@ -35,6 +56,12 @@
       margin: 0;
       overflow-x: auto;
       overflow-y: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .gallery::-webkit-scrollbar {
+      display: none;
     }
 
     .column {
@@ -98,6 +125,7 @@
       height: auto;
       object-fit: contain;
       display: block;
+      border-radius: 8px;
     }
 
     .controls {
@@ -238,6 +266,8 @@
   </style>
 </head>
 <body>
+  <div class="last-updated" id="last-updated"></div>
+
   <div class="gallery" id="gallery"></div>
 
   <section class="breakdown" id="breakdown">
@@ -253,6 +283,21 @@
 
     const gallery = document.getElementById("gallery");
     const breakdown = document.getElementById("breakdown");
+    const lastUpdatedEl = document.getElementById("last-updated");
+
+    function renderLastUpdated(ts) {
+      if (!ts) return;
+      const date = new Date(ts);
+      if (isNaN(date.getTime())) return;
+      const formatted = date.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+      lastUpdatedEl.textContent = "Last updated: " + formatted;
+    }
 
     // Tracks which column is currently being dragged for reordering.
     let draggedColumn = null;
@@ -306,6 +351,7 @@
     }
 
     function flowsFromManifest(data) {
+      renderLastUpdated(data.updatedAt);
       return data.folders.map((f) => ({
         title: f.name,
         folder: f.name,

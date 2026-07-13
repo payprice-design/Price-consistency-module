@@ -25,19 +25,20 @@ def natural_key(name):
 
 def build_manifest(root):
     folders = []
+    latest_mtime = 0
     for entry in sorted(os.scandir(root), key=lambda e: natural_key(e.name)):
         if not entry.is_dir() or entry.name.startswith("."):
             continue
-        images = [
-            f.name
-            for f in os.scandir(entry.path)
-            if f.is_file() and os.path.splitext(f.name)[1].lower() in IMAGE_EXTENSIONS
-        ]
+        images = []
+        for f in os.scandir(entry.path):
+            if f.is_file() and os.path.splitext(f.name)[1].lower() in IMAGE_EXTENSIONS:
+                images.append(f.name)
+                latest_mtime = max(latest_mtime, f.stat().st_mtime)
         if not images:
             continue
         images.sort(key=natural_key)
         folders.append({"name": entry.name, "images": images})
-    return {"folders": folders}
+    return {"folders": folders, "updatedAt": int(latest_mtime * 1000)}
 
 
 def main():
