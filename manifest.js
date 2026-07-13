@@ -8,9 +8,10 @@ window.FLOW_MANIFEST = {
         "2. PDP.png",
         "3. Room List.png",
         "4. BF 1.png",
-        "5. BF 2.png",
-        "6. Payment.png",
-        "7. Payment.png"
+        "5. BF 2-A.png",
+        "6. BF 2-B.png",
+        "7. Payment.png",
+        "8. Payment.png"
       ]
     },
     {
@@ -20,10 +21,11 @@ window.FLOW_MANIFEST = {
         "2. SRP - Applied.png",
         "3. PDP.png",
         "4. Room List.png",
-        "5. BF 1.png",
-        "6. BF 2.png",
-        "7. Payment.png",
-        "8. Payment Bottom Sheet.png"
+        "5. BF 1a.png",
+        "6. BF 1b.png",
+        "7. BF 2.png",
+        "8. Payment.png",
+        "9. Payment Bottom Sheet.png"
       ]
     },
     {
@@ -45,10 +47,11 @@ window.FLOW_MANIFEST = {
         "2. SRP - Applied.png",
         "3. PDP.png",
         "4. Room List.png",
-        "5. BF 1.png",
-        "6. BF 2.png",
-        "7. Payment.png",
-        "8. Payment Bottom Sheet.png"
+        "5. BF 1a.png",
+        "6. BF 1b.png",
+        "7. BF 2.png",
+        "8. Payment.png",
+        "9. Payment Bottom Sheet.png"
       ]
     },
     {
@@ -57,8 +60,8 @@ window.FLOW_MANIFEST = {
         "1. SRP.png",
         "2. PDP.png",
         "3. Room List.png",
-        "4. BF 1.png",
-        "5. BF.png",
+        "4. BF 1a.png",
+        "5. BF 1b.png",
         "6. BF 2.png",
         "7. Payment.png",
         "8. Payment Bottom Sheet.png"
@@ -70,9 +73,9 @@ window.FLOW_MANIFEST = {
         "1. SRP.png",
         "2. PDP.png",
         "3. Room List.png",
-        "4. BF 1.png",
-        "5. BF.png",
-        "6. BF.png",
+        "4. BF 1a.png",
+        "5. BF 1b.png",
+        "6. BF 2.png",
         "7. Payment.png",
         "8. Payment Bottom Sheet.png"
       ]
@@ -84,10 +87,11 @@ window.FLOW_MANIFEST = {
         "2. SRP - Applied.png",
         "3. PDP.png",
         "4. Room List.png",
-        "5. BF 1.png",
-        "6. BF 2.png",
-        "7. Payment.png",
-        "8. Payment Bottom Sheet.png"
+        "5. BF 1a.png",
+        "6. BF 1b.png",
+        "7. BF 2.png",
+        "8. Payment.png",
+        "9. Payment Bottom Sheet.png"
       ]
     }
   ]
