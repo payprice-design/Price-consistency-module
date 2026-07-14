@@ -84,7 +84,10 @@ class Handler(SimpleHTTPRequestHandler):
 
 
 def main():
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
+    # Always serve from this script's own directory, no matter where it's
+    # launched from (e.g. a preview runner with a different working dir).
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    port = int(sys.argv[1]) if len(sys.argv) > 1 else int(os.environ.get("PORT", 8000))
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     print(f"Serving on http://localhost:{port} (Ctrl+C to stop)")
     try:
