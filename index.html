@@ -25,18 +25,22 @@
       color: var(--text);
     }
 
-    .page-title {
-      font-size: 24px;
-      font-weight: 700;
-      text-align: center;
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
       margin: 0 0 32px;
     }
 
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+    }
+
     .last-updated {
-      position: fixed;
-      top: 12px;
-      right: 16px;
-      z-index: 10;
+      flex: 0 0 auto;
       font-size: 11px;
       font-weight: 500;
       color: #555;
@@ -264,46 +268,43 @@
       margin-top: 8px;
     }
 
-    .about {
+    .project-desc {
       width: 100%;
-      max-width: 820px;
-      margin: 80px auto 0;
-      padding: 28px 32px 40px;
+      margin: 72px 0 0;
+      padding: 24px 20px;
       background: var(--card-bg);
-      border-radius: 12px;
-      line-height: 1.6;
+      border-radius: 8px;
     }
 
-    .about__title {
-      font-size: 20px;
+    .project-desc__title {
+      font-size: 16px;
       font-weight: 600;
-      margin: 0 0 12px;
+      margin: 0 0 8px;
     }
 
-    .about p {
-      margin: 0 0 14px;
+    .project-desc__text {
       font-size: 14px;
+      line-height: 1.6;
       color: #333;
+      margin: 0 0 12px;
+      width: 100%;
     }
 
-    .about p:last-child {
+    .project-desc__text:last-child {
       margin-bottom: 0;
     }
 
-    .about strong {
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .about ul {
-      margin: 0 0 14px;
-      padding-left: 20px;
+    .project-desc__list {
       font-size: 14px;
+      line-height: 1.6;
       color: #333;
+      margin: 0 0 12px;
+      padding-left: 20px;
+      max-width: 720px;
     }
 
-    .about li {
-      margin-bottom: 6px;
+    .project-desc__list li {
+      margin-bottom: 4px;
     }
 
     @media (max-width: 760px) {
@@ -311,17 +312,14 @@
         width: 100%;
         max-width: 480px;
       }
-
-      .about {
-        padding: 22px 20px 32px;
-      }
     }
   </style>
 </head>
 <body>
-  <div class="last-updated" id="last-updated"></div>
-
-  <h1 class="page-title">Price Consistency Project: Hotel</h1>
+  <header class="page-header">
+    <h1 class="page-title">Price Consistency Project: Hotel</h1>
+    <div class="last-updated" id="last-updated"></div>
+  </header>
 
   <div class="gallery" id="gallery"></div>
 
@@ -329,31 +327,32 @@
     <h2 class="breakdown__title">Screen-by-screen breakdown</h2>
   </section>
 
-  <footer class="about">
-    <h2 class="about__title">About this project</h2>
-    <p>
-      The <strong>Price Consistency Project: Hotel</strong> documents how a room price is
-      displayed to the user across every screen of the hotel booking journey — from the
-      search results page all the way to payment. Its goal is to make sure the price a
-      customer sees stays consistent, transparent, and correctly labelled (per room/night,
-      total, before or after tax, and with or without promo) at every step.
+  <footer class="project-desc">
+    <h2 class="project-desc__title">About this project</h2>
+    <p class="project-desc__text">
+      The Price Consistency Project: Hotel documents how a room price is displayed
+      to the user across every screen of the hotel booking journey — from the search
+      results page all the way to payment. Its goal is to make sure the price a
+      customer sees stays consistent, transparent, and correctly labelled
+      (per room/night, total, before or after tax, and with or without promo) at
+      every step.
     </p>
-    <p>
-      Each column above is one <strong>booking flow scenario</strong>. Use the arrows to step
-      through its screens, drag the handle (&#9776;) to reorder columns for side-by-side
-      comparison, and open a section in the breakdown below to view all screens of a flow at
-      once. The scenarios cover the key pricing variations:
+    <p class="project-desc__text">
+      Each column above is one booking flow scenario. Use the arrows to step through
+      its screens, drag the handle (☰) to reorder columns for side-by-side comparison,
+      and open a section in the breakdown below to view all screens of a flow at once.
+      The scenarios cover the key pricing variations:
     </p>
-    <ul>
+    <ul class="project-desc__list">
       <li><strong>Room/night vs. total pay</strong> — whether the headline price is per night or the full stay.</li>
       <li><strong>With tax vs. without tax</strong> — how taxes and fees are surfaced (🔴 without, 🟢 with).</li>
       <li><strong>With promo vs. without promo</strong> — how discounts and cashback affect the displayed price.</li>
       <li><strong>Single vs. multi-night / multi-room</strong> — how quantity is reflected in the total.</li>
     </ul>
-    <p>
-      Screens are grouped by flow into folders and loaded automatically, so the gallery always
-      reflects the latest design exports — no manual updates needed when a screen is added,
-      renamed, or removed.
+    <p class="project-desc__text">
+      Screens are grouped by flow into folders and loaded automatically, so the gallery
+      always reflects the latest design exports — no manual updates needed when a screen
+      is added, renamed, or removed.
     </p>
   </footer>
 
