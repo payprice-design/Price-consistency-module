@@ -62,9 +62,12 @@
   .money { position: relative; flex: 0 0 124px; }
   .money::before { content: "Rp"; position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--ink-faint); pointer-events: none; font-weight: 600; }
   .money input { width: 100%; text-align: right; padding: 7px 9px 7px 26px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-2); color: var(--ink); font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .pct { position: relative; flex: 0 0 124px; }
+  .pct::after { content: "%"; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--ink-faint); pointer-events: none; font-weight: 600; }
+  .pct input { width: 100%; text-align: right; padding: 7px 24px 7px 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-2); color: var(--ink); font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
   input[type="number"] { -moz-appearance: textfield; }
   input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .money input:focus, .seg button:focus-visible, .btn:focus-visible, .stepper button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .money input:focus, .pct input:focus, .seg button:focus-visible, .btn:focus-visible, .stepper button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   .seg-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
   .seg-row > span { font-size: 13.5px; color: var(--ink-soft); }
@@ -206,7 +209,7 @@
             <li><b>Per room-night</b> (each room its own): <code>originalPrice</code>, <code>subsidyDirect</code>, <code>subsidyCashback</code>, <code>tixPoint</code>, <code>tax</code>.</li>
             <li><b>Order-level, once</b>: <code>promoDirect</code>, <code>promoCashback</code>, <code>convenienceFee</code>.</li>
             <li><b>Subtotal</b> = <code>Σ originalPrice − discount − cashback</code> (the "harga setelah cashback").</li>
-            <li><b>discount</b> = Σ<code>subsidyDirect</code> (+ <code>promoDirect</code> when promo).</li>
+            <li><b>discount</b> = Σ<code>subsidyDirect</code> (+ <code>promoDirect</code> when promo). <code>promoDirect</code> can be a flat Rp amount or a <b>%</b> of the subtotal after direct subsidy (<code>Σ originalPrice − Σ subsidyDirect</code>), optionally capped at a max discount.</li>
             <li><b>cashback</b> = Σ<code>subsidyCashback</code> + Σ<code>tixPoint</code>; <b>promo forfeits tixPoint</b> → Σ<code>subsidyCashback</code> + <code>promoCashback</code>. Returned as Blibli Tiket Points; <b>added back</b> into the total (not deducted).</li>
             <li><b>Total bayar</b> = Subtotal + Tax + Cashback. <b>Payment page adds the convenience fee</b> → Total pay; Booking Form does not.</li>
             <li><b>SRP</b> shows Gimmick (struck) + Main (after cashback); the after-tax price appears as a caption under the before-tax filter, and can be viewed per room/night or as the full-stay total.</li>
@@ -239,14 +242,18 @@
       { key: "tix2", label: "tixPoint", sub: "points · lost on promo", val: 100000 },
       { key: "tax2", label: "Tax", sub: "per night", val: 100000 }
     ]},
-    { title: "Order-level", note: "once per booking", fields: [
-      { key: "promoDirect", label: "Promo · direct", sub: "cuts price paid", val: 150000 },
+    { title: "Order-level", note: "once per booking",
+      toggle: { key: "promoDirectMode", label: "Promo · direct basis", options: [{ val: "rp", label: "Rp" }, { val: "pct", label: "%" }] },
+      fields: [
+      { key: "promoDirect", label: "Promo · direct", sub: "flat amount", val: 150000, showWhen: { promoDirectMode: "rp" } },
+      { key: "promoDirectPct", label: "Promo · direct", sub: "% of subtotal after subsidy", val: 5, unit: "pct", showWhen: { promoDirectMode: "pct" } },
+      { key: "promoDirectCap", label: "Promo · direct cap", sub: "max discount · 0 = no cap", val: 200000, showWhen: { promoDirectMode: "pct" } },
       { key: "promoCashback", label: "Promo · cashback", sub: "given back · 0 unless set", val: 0 },
       { key: "convenienceFee", label: "Convenience fee", sub: "flat per order", val: 20000 }
     ]}
   ];
 
-  var state = { comp: {}, afterTax: true, promo: false, rooms: 1, nights: 1, priceBasis: "night" };
+  var state = { comp: {}, afterTax: true, promo: false, rooms: 1, nights: 1, priceBasis: "night", promoDirectMode: "rp" };
   GROUPS.forEach(function (g) { g.fields.forEach(function (f) { state.comp[f.key] = f.val; }); });
 
   function rp(n) { return (n < 0 ? "-Rp" : "Rp") + Math.round(Math.abs(n)).toLocaleString("en-US"); }
@@ -266,11 +273,17 @@
     var c = state.comp, list = items(rooms, nights), u = list.length;
     var subtotalGross = 0, taxTotal = 0, sdTotal = 0, scTotal = 0, tixTotal = 0;
     list.forEach(function (it) { subtotalGross += it.rc.orig; taxTotal += it.rc.tax; sdTotal += it.rc.sd; scTotal += it.rc.sc; tixTotal += it.rc.tix; });
-    var discount = sdTotal + (promo ? c.promoDirect : 0);
+    var promoDirectAmt = c.promoDirect;                                    // flat Rp by default
+    if (state.promoDirectMode === "pct") {                                 // % of subtotal after direct subsidy, optionally capped
+      var pctBase = subtotalGross - sdTotal;
+      promoDirectAmt = pctBase * ((c.promoDirectPct || 0) / 100);
+      if (c.promoDirectCap > 0) promoDirectAmt = Math.min(promoDirectAmt, c.promoDirectCap);
+    }
+    var discount = sdTotal + (promo ? promoDirectAmt : 0);
     var cashback = scTotal + (promo ? c.promoCashback : tixTotal);         // Σ subsidyCashback + Σ tixPoint (per room-night)
     var subAfterCb = subtotalGross - discount - cashback;                  // "harga setelah cashback", before tax
     var pay = subtotalGross - discount + taxTotal;                         // Total bayar
-    var promoAdjPerUnit = promo ? (c.promoDirect + c.promoCashback) / u : 0;
+    var promoAdjPerUnit = promo ? (promoDirectAmt + c.promoCashback) / u : 0;
     var lines = list.map(function (it, i) {
       return { room: it.room, night: (i % nights) + 1, amount: it.rc.orig - it.rc.sd - it.rc.sc - (promo ? promoAdjPerUnit : it.rc.tix) };
     });
@@ -349,6 +362,10 @@
     syncSeg();
     document.getElementById("nights-out").textContent = state.nights;
     document.getElementById("room2-grp").style.display = state.rooms === 2 ? "" : "none";
+    document.querySelectorAll("[data-show-key]").forEach(function (el) {
+      var k = el.getAttribute("data-show-key");
+      el.style.display = String(state[k]) === el.getAttribute("data-show-val") ? "" : "none";
+    });
     var effCb = state.promo ? "Σ subsidyCashback" + (state.comp.promoCashback ? " + promoCashback" : "") + " (tixPoint forfeited)"
                             : "Σ subsidyCashback + Σ tixPoint (per room-night)";
     document.getElementById("foot").textContent =
@@ -429,19 +446,37 @@
     clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove("show"); }, 1900);
   }
 
+  function fieldHTML(f) {
+    var isPct = f.unit === "pct";
+    var wrapCls = isPct ? "pct" : "money";
+    var step = isPct ? "0.5" : "10000";
+    var extra = isPct ? ' max="100"' : "";
+    var showAttr = "";
+    if (f.showWhen) {
+      var k = Object.keys(f.showWhen)[0];
+      showAttr = ' data-show-key="' + k + '" data-show-val="' + f.showWhen[k] + '"';
+    }
+    return '<div class="field"' + showAttr + '><label>' + f.label + "<small>" + f.sub + "</small></label>" +
+      '<span class="' + wrapCls + '"><input type="number" inputmode="decimal" step="' + step + '" min="0"' + extra +
+      ' data-comp="' + f.key + '" value="' + f.val + '"></span></div>';
+  }
+
   (function buildFields() {
     var host = document.getElementById("comp-fields");
     host.innerHTML = GROUPS.map(function (g) {
-      var fields = g.fields.map(function (f) {
-        return '<div class="field"><label>' + f.label + "<small>" + f.sub + "</small></label>" +
-          '<span class="money"><input type="number" inputmode="numeric" step="10000" min="0" data-comp="' + f.key + '" value="' + f.val + '"></span></div>';
-      }).join("");
+      var fields = g.fields.map(fieldHTML).join("");
+      var toggle = "";
+      if (g.toggle) {
+        toggle = '<div class="seg-row"><span>' + g.toggle.label + '</span><div class="seg" data-key="' + g.toggle.key + '">' +
+          g.toggle.options.map(function (o) { return '<button data-val="' + o.val + '">' + o.label + "</button>"; }).join("") +
+          "</div></div>";
+      }
       return '<div class="grp"' + (g.room2 ? ' id="room2-grp"' : "") + '><div class="grp-title">' + g.title +
-        (g.note ? " <span>" + g.note + "</span>" : "") + "</div>" + fields + "</div>";
+        (g.note ? " <span>" + g.note + "</span>" : "") + "</div>" + toggle + fields + "</div>";
     }).join("");
     host.querySelectorAll("input[data-comp]").forEach(function (inp) {
       inp.addEventListener("input", function () {
-        var v = parseInt(inp.value, 10);
+        var v = parseFloat(inp.value);
         state.comp[inp.getAttribute("data-comp")] = isNaN(v) ? 0 : v;
         render();
       });
