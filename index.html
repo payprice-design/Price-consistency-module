@@ -308,6 +308,26 @@
       margin-bottom: 4px;
     }
 
+    .calculator {
+      width: 100%;
+      margin: 72px 0 0;
+    }
+
+    .calculator__title {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 16px 3px;
+    }
+
+    .calculator__frame {
+      width: 100%;
+      min-height: 600px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--card-bg);
+      display: block;
+    }
+
     @media (max-width: 760px) {
       .column {
         width: 100%;
@@ -356,6 +376,17 @@
       is added, renamed, or removed.
     </p>
   </footer>
+
+  <section class="calculator" id="calculator">
+    <h2 class="calculator__title">Accommodation Price Calculator</h2>
+    <iframe
+      class="calculator__frame"
+      id="calculator-frame"
+      src="accom_price_calculator.html"
+      title="Accommodation Price Display Calculator"
+      loading="lazy"
+    ></iframe>
+  </section>
 
   <!-- Optional baked manifest for offline use (generate with generate_manifest.py).
        Missing file is fine: the page falls back to the dev server or probing. -->
@@ -659,6 +690,36 @@
     (async () => {
       const flows = await getFlows();
       flows.forEach(buildFlow);
+    })();
+  </script>
+
+  <script>
+    // Auto-size the calculator iframe to its content so it renders inline
+    // (no inner scrollbar) while keeping its styles isolated from this page.
+    (function () {
+      const frame = document.getElementById("calculator-frame");
+      if (!frame) return;
+
+      function resize() {
+        try {
+          const doc = frame.contentDocument || frame.contentWindow.document;
+          if (doc && doc.documentElement) {
+            frame.style.height = doc.documentElement.scrollHeight + "px";
+          }
+        } catch (e) {
+          /* cross-origin (shouldn't happen for a local file) — leave min-height */
+        }
+      }
+
+      frame.addEventListener("load", function () {
+        resize();
+        // Re-measure after fonts/layout settle and on inner resizes.
+        setTimeout(resize, 200);
+        try {
+          frame.contentWindow.addEventListener("resize", resize);
+        } catch (e) {}
+      });
+      window.addEventListener("resize", resize);
     })();
   </script>
 </body>

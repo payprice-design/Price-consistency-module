@@ -1,0 +1,482 @@
+<style>
+  :root {
+    --ground: #eef1f6; --surface: #ffffff; --surface-2: #f6f8fb;
+    --ink: #14202e; --ink-soft: #47586b; --ink-faint: #7c8ba0;
+    --line: #dde4ee; --line-strong: #c7d2e2;
+    --accent: #0a5ad4; --accent-ink: #084ab0; --accent-soft: #e7f0fe;
+    --good: #0c8f5f; --good-soft: #e2f5ec; --warn: #c2410c;
+    --shadow: 0 1px 2px rgba(20,32,46,.06), 0 6px 24px -12px rgba(20,32,46,.18);
+    --mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #0c1219; --surface: #141d28; --surface-2: #101822;
+      --ink: #e8eef7; --ink-soft: #9db0c5; --ink-faint: #6d7f94;
+      --line: #24303f; --line-strong: #33465a;
+      --accent: #4f8dff; --accent-ink: #7aa8ff; --accent-soft: #16273f;
+      --good: #34d399; --good-soft: #10261e; --warn: #fb923c;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #eef1f6; --surface: #ffffff; --surface-2: #f6f8fb;
+    --ink: #14202e; --ink-soft: #47586b; --ink-faint: #7c8ba0;
+    --line: #dde4ee; --line-strong: #c7d2e2;
+    --accent: #0a5ad4; --accent-ink: #084ab0; --accent-soft: #e7f0fe;
+    --good: #0c8f5f; --good-soft: #e2f5ec; --warn: #c2410c;
+    --shadow: 0 1px 2px rgba(20,32,46,.06), 0 6px 24px -12px rgba(20,32,46,.18);
+  }
+  :root[data-theme="dark"] {
+    --ground: #0c1219; --surface: #141d28; --surface-2: #101822;
+    --ink: #e8eef7; --ink-soft: #9db0c5; --ink-faint: #6d7f94;
+    --line: #24303f; --line-strong: #33465a;
+    --accent: #4f8dff; --accent-ink: #7aa8ff; --accent-soft: #16273f;
+    --good: #34d399; --good-soft: #10261e; --warn: #fb923c;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 22px 64px; }
+
+  header.top { margin-bottom: 22px; }
+  .eyebrow { font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-ink); font-weight: 700; }
+  header.top h1 { font-size: clamp(22px, 3.4vw, 30px); margin: 6px 0 4px; letter-spacing: -.02em; text-wrap: balance; font-weight: 750; }
+  header.top p { margin: 0; color: var(--ink-soft); max-width: 64ch; font-size: 14.5px; }
+
+  .app { display: grid; grid-template-columns: 328px 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 880px) { .app { grid-template-columns: 1fr; } }
+
+  .controls { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); position: sticky; top: 18px; }
+  @media (max-width: 880px) { .controls { position: static; } }
+  .controls h2 { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 12px; font-weight: 700; }
+  .ctl-group + .ctl-group { margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--line); }
+  .grp + .grp { margin-top: 15px; padding-top: 13px; border-top: 1px dashed var(--line); }
+  .grp-title { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-ink); font-weight: 700; margin-bottom: 9px; display: flex; align-items: baseline; gap: 6px; }
+  .grp-title span { color: var(--ink-faint); font-weight: 500; letter-spacing: .02em; text-transform: none; font-size: 11px; }
+
+  .field { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .field label { font-size: 13px; color: var(--ink-soft); }
+  .field label small { display: block; color: var(--ink-faint); font-size: 10.5px; }
+  .money { position: relative; flex: 0 0 124px; }
+  .money::before { content: "Rp"; position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--ink-faint); pointer-events: none; font-weight: 600; }
+  .money input { width: 100%; text-align: right; padding: 7px 9px 7px 26px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-2); color: var(--ink); font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+  input[type="number"] { -moz-appearance: textfield; }
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .money input:focus, .seg button:focus-visible, .btn:focus-visible, .stepper button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .seg-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .seg-row > span { font-size: 13.5px; color: var(--ink-soft); }
+  .seg-row > span small { display: block; color: var(--ink-faint); font-size: 11px; }
+  .seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 9px; padding: 2px; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); cursor: pointer; padding: 5px 11px; border-radius: 7px; font: inherit; font-size: 12.5px; font-weight: 600; transition: background .12s, color .12s; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .stepper { display: inline-flex; align-items: center; gap: 2px; }
+  .stepper button { width: 30px; height: 30px; border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--ink); border-radius: 8px; cursor: pointer; font-size: 16px; line-height: 1; }
+  .stepper output { min-width: 26px; text-align: center; font-variant-numeric: tabular-nums; font-weight: 700; }
+
+  .output { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .summary { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; box-shadow: var(--shadow); display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-right: auto; }
+  .chip { font-size: 12px; font-weight: 650; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); border: 1px solid transparent; }
+  .chip.muted { background: var(--surface-2); color: var(--ink-soft); border-color: var(--line); }
+  .headline { text-align: right; }
+  .headline .k { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; }
+  .headline .v { font-family: var(--mono); font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .headline .v.pay { color: var(--accent-ink); }
+  .headline .v.cb { color: var(--good); font-size: 16px; }
+
+  .funnel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; }
+  @media (max-width: 720px) { .funnel { grid-template-columns: 1fr; } }
+  .surface-card { background: var(--surface); border: 1px solid var(--line); border-radius: 13px; padding: 15px 15px 16px; box-shadow: var(--shadow); position: relative; min-width: 0; }
+  .surface-card::after { content: "→"; position: absolute; right: -11px; top: 46px; color: var(--line-strong); font-weight: 700; z-index: 2; font-size: 15px; }
+  .funnel .surface-card:last-child::after { display: none; }
+  @media (max-width: 720px) { .surface-card::after { content: "↓"; right: 50%; top: auto; bottom: -15px; transform: translateX(50%); } }
+  .surface-card .stage { font-size: 11px; letter-spacing: .11em; text-transform: uppercase; font-weight: 700; color: var(--accent-ink); }
+  .surface-card .stage b { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; background: var(--accent-soft); border-radius: 6px; margin-right: 6px; font-size: 10px; }
+  .surface-card .scope { font-size: 11.5px; color: var(--ink-faint); margin: 2px 0 12px; }
+
+  .prow { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 5px 0; }
+  .prow + .prow { border-top: 1px solid var(--line); }
+  .prow .lbl { font-size: 12.5px; color: var(--ink-soft); }
+  .prow .amt { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+  .prow.gimmick .amt { color: var(--ink-faint); text-decoration: line-through; text-decoration-thickness: 1px; font-weight: 500; }
+  .prow.gimmick .lbl { color: var(--ink-faint); }
+  .prow.main .amt { font-size: 15px; font-weight: 700; }
+  .srp-cap { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; padding-top: 6px; border-top: 1px dotted var(--line); font-size: 11.5px; color: var(--ink-faint); }
+  .srp-cap .amt { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  .brow { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; font-size: 13px; }
+  .brow .l { color: var(--ink-soft); }
+  .brow .n { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .brow.item { padding: 2px 0; font-size: 12px; }
+  .brow.item .l { padding-left: 12px; color: var(--ink-faint); }
+  .brow.item .l::before { content: "•"; margin-right: 6px; }
+  .brow.item .n { color: var(--ink-soft); font-weight: 500; }
+  .brow.total { border-top: 1px solid var(--line-strong); margin-top: 4px; padding-top: 8px; }
+  .brow.total .l { color: var(--ink); font-weight: 700; }
+  .brow.total .n { color: var(--accent-ink); font-weight: 700; }
+  .brow.cash .l, .brow.cash .n { color: var(--good); font-weight: 650; }
+
+  .pay-big { font-family: var(--mono); font-size: clamp(22px, 3.6vw, 30px); font-weight: 750; color: var(--accent-ink); letter-spacing: -.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .pay-sub { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+  .pay-pill { margin-top: 13px; background: var(--accent); color: #fff; text-align: center; padding: 9px; border-radius: 10px; font-weight: 700; font-size: 13px; }
+  .pay-points { margin-top: 11px; text-align: center; font-size: 12px; color: var(--ink-soft); }
+  .pay-points b { color: var(--good); font-weight: 700; }
+  .pay-breakdown { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--line-strong); }
+  .pay-bd-title { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; margin-bottom: 7px; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+  .btn { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 9px 15px; border-radius: 9px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: border-color .12s, transform .05s; }
+  .btn:hover { border-color: var(--accent); }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn .ic { font-size: 14px; }
+  .actions .hint { font-size: 12px; color: var(--ink-faint); margin-left: auto; }
+
+  details.model { margin-top: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 13px; padding: 4px 18px; box-shadow: var(--shadow); }
+  details.model summary { cursor: pointer; padding: 12px 0; font-weight: 700; font-size: 13.5px; list-style: none; display: flex; align-items: center; gap: 8px; }
+  details.model summary::-webkit-details-marker { display: none; }
+  details.model summary::before { content: "▸"; color: var(--accent); transition: transform .15s; }
+  details.model[open] summary::before { transform: rotate(90deg); }
+  details.model .body { padding: 0 0 16px; color: var(--ink-soft); font-size: 13.5px; }
+  details.model code { font-family: var(--mono); background: var(--surface-2); padding: 1px 5px; border-radius: 5px; font-size: 12.5px; color: var(--ink); }
+  details.model ul { margin: 8px 0; padding-left: 20px; }
+  details.model li { margin: 5px 0; }
+
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--ground); padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; box-shadow: var(--shadow); z-index: 50; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  .foot { margin-top: 20px; font-size: 12px; color: var(--ink-faint); }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">tiket.com · Pricing &amp; Promo</div>
+    <h1>Accommodation Price Display Calculator</h1>
+    <p>Set each room's pricing components and the booking config, and see what renders on the three funnel surfaces — the SRP price card, the Booking Form price summary, and the Payment Page total. One model, so the numbers can't drift.</p>
+  </header>
+
+  <div class="app">
+    <aside class="controls">
+      <h2>Components</h2>
+      <div class="ctl-group" id="comp-fields"></div>
+
+      <div class="ctl-group">
+        <h2>Display &amp; booking</h2>
+        <div class="seg-row"><span>Tax in shown price</span>
+          <div class="seg" data-key="afterTax"><button data-val="false">Before tax</button><button data-val="true">After tax</button></div>
+        </div>
+        <div class="seg-row"><span>Promo applied</span>
+          <div class="seg" data-key="promo"><button data-val="false">Off</button><button data-val="true">On</button></div>
+        </div>
+        <div class="seg-row"><span>Rooms</span>
+          <div class="seg" data-key="rooms"><button data-val="1">1</button><button data-val="2">2</button></div>
+        </div>
+        <div class="seg-row"><span>Nights</span>
+          <div class="stepper" data-key="nights"><button data-step="-1" aria-label="Fewer nights">−</button><output id="nights-out">1</output><button data-step="1" aria-label="More nights">+</button></div>
+        </div>
+        <div class="seg-row"><span>SRP price shown as<small>affects SRP card only</small></span>
+          <div class="seg" data-key="priceBasis"><button data-val="night">Per room/night</button><button data-val="total">Total</button></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="output">
+      <div class="summary">
+        <div class="chips" id="chips"></div>
+        <div class="headline"><div class="k">Total pay (+ fee)</div><div class="v pay" id="hl-pay">—</div></div>
+        <div class="headline"><div class="k">Points earned</div><div class="v cb" id="hl-cb">—</div></div>
+      </div>
+
+      <section class="funnel" id="funnel"></section>
+
+      <div class="actions">
+        <button class="btn primary" id="copy-block"><span class="ic">⧉</span> Copy this block (TSV)</button>
+        <button class="btn" id="copy-4"><span class="ic">⧉</span> Copy all 4 variants</button>
+        <button class="btn" id="copy-12"><span class="ic">⧉</span> Copy all 12 blocks</button>
+        <span class="hint">Paste straight into Google Sheets — tabs become columns.</span>
+      </div>
+
+      <details class="model">
+        <summary>The locked display model</summary>
+        <div class="body">
+          <ul>
+            <li><b>Per room-night</b> (each room its own): <code>originalPrice</code>, <code>subsidyDirect</code>, <code>subsidyCashback</code>, <code>tixPoint</code>, <code>tax</code>.</li>
+            <li><b>Order-level, once</b>: <code>promoDirect</code>, <code>promoCashback</code>, <code>convenienceFee</code>.</li>
+            <li><b>Subtotal</b> = <code>Σ originalPrice − discount − cashback</code> (the "harga setelah cashback").</li>
+            <li><b>discount</b> = Σ<code>subsidyDirect</code> (+ <code>promoDirect</code> when promo).</li>
+            <li><b>cashback</b> = Σ<code>subsidyCashback</code> + Σ<code>tixPoint</code>; <b>promo forfeits tixPoint</b> → Σ<code>subsidyCashback</code> + <code>promoCashback</code>. Returned as Blibli Tiket Points; <b>added back</b> into the total (not deducted).</li>
+            <li><b>Total bayar</b> = Subtotal + Tax + Cashback. <b>Payment page adds the convenience fee</b> → Total pay; Booking Form does not.</li>
+            <li><b>SRP</b> shows Gimmick (struck) + Main (after cashback); the after-tax price appears as a caption under the before-tax filter, and can be viewed per room/night or as the full-stay total.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="foot" id="foot"></div>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var GROUPS = [
+    { title: "Room 1", note: "per night", fields: [
+      { key: "orig1", label: "Original price", sub: "before tax", val: 3000000 },
+      { key: "sd1", label: "Subsidy · direct", sub: "cuts price paid", val: 50000 },
+      { key: "sc1", label: "Subsidy · cashback", sub: "given back", val: 50000 },
+      { key: "tix1", label: "tixPoint", sub: "points · lost on promo", val: 100000 },
+      { key: "tax1", label: "Tax", sub: "per night", val: 100000 }
+    ]},
+    { title: "Room 2", note: "per night", room2: true, fields: [
+      { key: "orig2", label: "Original price", sub: "before tax", val: 5000000 },
+      { key: "sd2", label: "Subsidy · direct", sub: "cuts price paid", val: 50000 },
+      { key: "sc2", label: "Subsidy · cashback", sub: "given back", val: 50000 },
+      { key: "tix2", label: "tixPoint", sub: "points · lost on promo", val: 100000 },
+      { key: "tax2", label: "Tax", sub: "per night", val: 100000 }
+    ]},
+    { title: "Order-level", note: "once per booking", fields: [
+      { key: "promoDirect", label: "Promo · direct", sub: "cuts price paid", val: 150000 },
+      { key: "promoCashback", label: "Promo · cashback", sub: "given back · 0 unless set", val: 0 },
+      { key: "convenienceFee", label: "Convenience fee", sub: "flat per order", val: 20000 }
+    ]}
+  ];
+
+  var state = { comp: {}, afterTax: true, promo: false, rooms: 1, nights: 1, priceBasis: "night" };
+  GROUPS.forEach(function (g) { g.fields.forEach(function (f) { state.comp[f.key] = f.val; }); });
+
+  function rp(n) { return (n < 0 ? "-Rp" : "Rp") + Math.round(Math.abs(n)).toLocaleString("en-US"); }
+  function pts(n) { return Math.round(n).toLocaleString("en-US"); }
+
+  function roomComp(r) {
+    var c = state.comp;
+    return r === 1 ? { orig: c.orig1, sd: c.sd1, sc: c.sc1, tax: c.tax1, tix: c.tix1 }
+                   : { orig: c.orig2, sd: c.sd2, sc: c.sc2, tax: c.tax2, tix: c.tix2 };
+  }
+  function items(rooms, nights) {
+    var a = [];
+    for (var r = 1; r <= rooms; r++) { var rc = roomComp(r); for (var n = 0; n < nights; n++) a.push({ room: r, rc: rc }); }
+    return a;
+  }
+  function calc(rooms, nights, afterTax, promo) {
+    var c = state.comp, list = items(rooms, nights), u = list.length;
+    var subtotalGross = 0, taxTotal = 0, sdTotal = 0, scTotal = 0, tixTotal = 0;
+    list.forEach(function (it) { subtotalGross += it.rc.orig; taxTotal += it.rc.tax; sdTotal += it.rc.sd; scTotal += it.rc.sc; tixTotal += it.rc.tix; });
+    var discount = sdTotal + (promo ? c.promoDirect : 0);
+    var cashback = scTotal + (promo ? c.promoCashback : tixTotal);         // Σ subsidyCashback + Σ tixPoint (per room-night)
+    var subAfterCb = subtotalGross - discount - cashback;                  // "harga setelah cashback", before tax
+    var pay = subtotalGross - discount + taxTotal;                         // Total bayar
+    var promoAdjPerUnit = promo ? (c.promoDirect + c.promoCashback) / u : 0;
+    var lines = list.map(function (it, i) {
+      return { room: it.room, night: (i % nights) + 1, amount: it.rc.orig - it.rc.sd - it.rc.sc - (promo ? promoAdjPerUnit : it.rc.tix) };
+    });
+    var lift = afterTax ? taxTotal : 0;
+    return {
+      gimmick: subtotalGross + lift, main: subAfterCb + lift,
+      pay: pay, plusConv: pay + c.convenienceFee, cashback: cashback,
+      subAfterCb: subAfterCb, taxTotal: taxTotal, conv: c.convenienceFee,
+      afterTaxMain: subAfterCb + taxTotal, lines: lines, units: u
+    };
+  }
+
+  function brow(l, n, cls) { return '<div class="brow ' + (cls || "") + '"><span class="l">' + l + '</span><span class="n">' + n + "</span></div>"; }
+  function lineHTML(d, rooms, nights) {
+    if (d.units < 2) return "";
+    var out = "";
+    for (var r = 1; r <= rooms; r++) {
+      d.lines.filter(function (l) { return l.room === r; }).forEach(function (l) {
+        var lbl = (rooms > 1 ? "R" + r + " · " : "") + "Malam " + l.night + " x 1 kamar";
+        out += brow(lbl, rp(l.amount), "item");
+      });
+    }
+    return out;
+  }
+
+  function render() {
+    var srp = calc(1, 1, state.afterTax, state.promo);
+    var agg = calc(state.rooms, state.nights, state.afterTax, state.promo);
+
+    var chips = [
+      { t: state.afterTax ? "After tax" : "Before tax", on: true },
+      { t: state.promo ? "Promo on" : "No promo", on: state.promo },
+      { t: state.rooms + (state.rooms > 1 ? " rooms" : " room") + " × " + state.nights + (state.nights > 1 ? " nights" : " night"), on: false }
+    ];
+    document.getElementById("chips").innerHTML = chips.map(function (c) {
+      return '<span class="chip' + (c.on ? "" : " muted") + '">' + c.t + "</span>";
+    }).join("");
+    document.getElementById("hl-pay").textContent = rp(agg.plusConv);
+    document.getElementById("hl-cb").textContent = pts(agg.cashback) + " pts";
+
+    // ---- SRP card ----
+    var srpD = state.priceBasis === "total" ? agg : srp;
+    var srpSub = state.priceBasis === "total" ? "full stay total" : "Room 1 · one night";
+    var srpBody =
+      '<div class="prow gimmick"><span class="lbl">Gimmick Price before Subsidy</span><span class="amt">' + rp(srpD.gimmick) + "</span></div>" +
+      '<div class="prow main"><span class="lbl">Main (after cashback)</span><span class="amt">' + rp(srpD.main) + "</span></div>" +
+      (!state.afterTax ? '<div class="srp-cap"><span>After taxes</span><span class="amt">' + rp(srpD.afterTaxMain) + "</span></div>" : "");
+    var srpCard = card(1, "SRP", srpSub, srpBody);
+
+    // ---- Booking Form card ----
+    var bfBody =
+      brow("Subtotal", rp(agg.subAfterCb)) + lineHTML(agg, state.rooms, state.nights) +
+      brow("Pajak &amp; biaya lainnya", rp(agg.taxTotal)) +
+      brow("Cashback (dikembalikan)", rp(agg.cashback), "cash") +
+      brow("Total bayar", rp(agg.pay), "total");
+    var bfCard = card(2, "Booking Form", "full order", bfBody);
+
+    // ---- Payment Page card ----
+    var detail =
+      brow("Subtotal", rp(agg.subAfterCb)) + lineHTML(agg, state.rooms, state.nights) +
+      brow("Tax &amp; fees", rp(agg.taxTotal)) +
+      brow("Returned as cashback", pts(agg.cashback) + " pts", "cash") +
+      brow("Total", rp(agg.pay), "total") +
+      brow("Convenience fee", rp(agg.conv)) +
+      brow("Total pay", rp(agg.plusConv), "total");
+    var payBody =
+      '<div class="pay-big">' + rp(agg.plusConv) + "</div>" +
+      '<div class="pay-sub">Total pay · incl. convenience fee ' + rp(agg.conv) + "</div>" +
+      '<div class="pay-pill">Pay now</div>' +
+      '<div class="pay-points">Get <b>' + pts(agg.cashback) + "</b> Blibli Tiket Points</div>" +
+      '<div class="pay-breakdown"><div class="pay-bd-title">Breakdown</div>' + detail + "</div>";
+    var payCard = card(3, "Payment Page", "full order", payBody);
+
+    document.getElementById("funnel").innerHTML = srpCard + bfCard + payCard;
+
+    syncSeg();
+    document.getElementById("nights-out").textContent = state.nights;
+    document.getElementById("room2-grp").style.display = state.rooms === 2 ? "" : "none";
+    var effCb = state.promo ? "Σ subsidyCashback" + (state.comp.promoCashback ? " + promoCashback" : "") + " (tixPoint forfeited)"
+                            : "Σ subsidyCashback + Σ tixPoint (per room-night)";
+    document.getElementById("foot").textContent =
+      "Units: " + agg.units + " room-night" + (agg.units > 1 ? "s" : "") + "  ·  cashback = " + effCb +
+      "  ·  Total bayar = Subtotal + Tax + Cashback (returned as points, not deducted)  ·  Payment adds the convenience fee → Total pay.";
+  }
+
+  function card(abbr, name, sub, body) {
+    return '<div class="surface-card"><div class="stage"><b>' + abbr + "</b>" + name + '</div><div class="scope">' + sub + "</div>" + body + "</div>";
+  }
+  function syncSeg() {
+    document.querySelectorAll(".seg").forEach(function (seg) {
+      var key = seg.getAttribute("data-key");
+      seg.querySelectorAll("button").forEach(function (b) {
+        b.setAttribute("aria-pressed", b.getAttribute("data-val") === String(state[key]) ? "true" : "false");
+      });
+    });
+  }
+
+  // ---- TSV export ----
+  function tsvBlock(title, afterTax, promo, rooms, nights) {
+    var srp = calc(1, 1, afterTax, promo);
+    var agg = calc(rooms, nights, afterTax, promo);
+    var L = [];
+    L.push(title);
+    L.push("SRP\tAmount");
+    L.push("Gimmick Price before Subsidy\t" + rp(srp.gimmick));
+    L.push("Main (after cashback)\t" + rp(srp.main));
+    if (!afterTax) L.push("After taxes\t" + rp(srp.afterTaxMain));
+    L.push("");
+    L.push("Booking Form\tAmount");
+    L.push("Subtotal\t" + rp(agg.subAfterCb));
+    if (agg.units > 1) agg.lines.forEach(function (l) { L.push("  " + (rooms > 1 ? "R" + l.room + " " : "") + "Malam " + l.night + " x 1 kamar\t" + rp(l.amount)); });
+    L.push("Pajak & biaya lainnya\t" + rp(agg.taxTotal));
+    L.push("Cashback (dikembalikan)\t" + rp(agg.cashback));
+    L.push("Total bayar\t" + rp(agg.pay));
+    L.push("");
+    L.push("Payment Page\tAmount");
+    L.push("Total pay\t" + rp(agg.plusConv));
+    L.push("Blibli Tiket Points earned\t" + pts(agg.cashback));
+    L.push("  Subtotal\t" + rp(agg.subAfterCb));
+    L.push("  Tax & fees\t" + rp(agg.taxTotal));
+    L.push("  Returned as cashback\t" + pts(agg.cashback) + " pts");
+    L.push("  Total\t" + rp(agg.pay));
+    L.push("  Convenience fee\t" + rp(agg.conv));
+    L.push("  Total pay\t" + rp(agg.plusConv));
+    return L.join("\n");
+  }
+  function configLabel(rooms, nights) { return rooms + "R" + nights + "N"; }
+  function variantTitle(rooms, nights, afterTax, promo) {
+    return configLabel(rooms, nights) + " | " + (afterTax ? "after-tax " : "before-tax") + " | " + (promo ? "+ promo" : "no promo");
+  }
+  function fourVariants(rooms, nights) {
+    var out = [];
+    [[true, false], [false, false], [true, true], [false, true]].forEach(function (v) {
+      out.push(tsvBlock(variantTitle(rooms, nights, v[0], v[1]), v[0], v[1], rooms, nights));
+    });
+    return out.join("\n\n");
+  }
+
+  function copy(text, msg) {
+    var done = function () { toast(msg); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); });
+    } else { fallbackCopy(text); done(); }
+  }
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+  var toastT;
+  function toast(msg) {
+    var el = document.getElementById("toast");
+    el.textContent = msg; el.classList.add("show");
+    clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove("show"); }, 1900);
+  }
+
+  (function buildFields() {
+    var host = document.getElementById("comp-fields");
+    host.innerHTML = GROUPS.map(function (g) {
+      var fields = g.fields.map(function (f) {
+        return '<div class="field"><label>' + f.label + "<small>" + f.sub + "</small></label>" +
+          '<span class="money"><input type="number" inputmode="numeric" step="10000" min="0" data-comp="' + f.key + '" value="' + f.val + '"></span></div>';
+      }).join("");
+      return '<div class="grp"' + (g.room2 ? ' id="room2-grp"' : "") + '><div class="grp-title">' + g.title +
+        (g.note ? " <span>" + g.note + "</span>" : "") + "</div>" + fields + "</div>";
+    }).join("");
+    host.querySelectorAll("input[data-comp]").forEach(function (inp) {
+      inp.addEventListener("input", function () {
+        var v = parseInt(inp.value, 10);
+        state.comp[inp.getAttribute("data-comp")] = isNaN(v) ? 0 : v;
+        render();
+      });
+    });
+  })();
+
+  document.querySelectorAll(".seg").forEach(function (seg) {
+    var key = seg.getAttribute("data-key");
+    seg.querySelectorAll("button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var raw = b.getAttribute("data-val");
+        state[key] = raw === "true" ? true : raw === "false" ? false : /^\d+$/.test(raw) ? parseInt(raw, 10) : raw;
+        render();
+      });
+    });
+  });
+  document.querySelectorAll('.stepper[data-key="nights"] button').forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.nights = Math.max(1, Math.min(5, state.nights + parseInt(b.getAttribute("data-step"), 10)));
+      render();
+    });
+  });
+
+  document.getElementById("copy-block").addEventListener("click", function () {
+    copy(tsvBlock(variantTitle(state.rooms, state.nights, state.afterTax, state.promo), state.afterTax, state.promo, state.rooms, state.nights), "Block copied — paste into Sheets");
+  });
+  document.getElementById("copy-4").addEventListener("click", function () {
+    copy(fourVariants(state.rooms, state.nights), "All 4 variants copied (" + configLabel(state.rooms, state.nights) + ")");
+  });
+  document.getElementById("copy-12").addEventListener("click", function () {
+    var out = [];
+    [[1, 1], [1, 2], [2, 1]].forEach(function (cf) { out.push(fourVariants(cf[0], cf[1])); });
+    copy(out.join("\n\n"), "All 12 blocks copied (1R1N · 1R2N · 2R1N)");
+  });
+
+  render();
+})();
+</script>
