@@ -4,7 +4,7 @@
     {
       "name": "wireframe-gallery",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["/Users/ryan.setiawan/Downloads/Price-consistency-module-main/server.py"],
+      "runtimeArgs": ["server.py"],
       "port": 8000,
       "autoPort": true
     }
