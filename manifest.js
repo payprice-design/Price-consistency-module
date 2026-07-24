@@ -6,7 +6,9 @@ window.FLOW_MANIFEST = {
       "images": [
         "1. SRP.png",
         "2. PDP.png",
-        "3. Room List.png",
+        "3A. Room List.png",
+        "3B. Room Detail.png",
+        "3C. Room Detail Break Down.png",
         "4. BF 1.png",
         "5. BF 2-A.png",
         "6. BF 2-B.png",
@@ -20,7 +22,9 @@ window.FLOW_MANIFEST = {
         "1. SRP - Unapplied.png",
         "2. SRP - Applied.png",
         "3. PDP.png",
-        "4. Room List.png",
+        "4A. Room List.png",
+        "4B. Room Detail.png",
+        "4C. Room Detail Breakdown.png",
         "5. BF 1a.png",
         "6. BF 1b.png",
         "7. BF 2.png",
@@ -33,7 +37,9 @@ window.FLOW_MANIFEST = {
       "images": [
         "1. SRP.png",
         "2. PDP.png",
-        "3. Room List.png",
+        "3A. Room List.png",
+        "3B. Room Detail.png",
+        "3C. Room Detail Break Down.png",
         "4. BF 1.png",
         "5. BF 2.png",
         "6. Payment.png",
@@ -46,7 +52,9 @@ window.FLOW_MANIFEST = {
         "1. SRP - Unapplied.png",
         "2. SRP - Applied.png",
         "3. PDP.png",
-        "4. Room List.png",
+        "4A. Room List.png",
+        "4B. Room Detail.png",
+        "4C. Room Detail Breakdown.png",
         "5. BF 1a.png",
         "6. BF 1b.png",
         "7. BF 2.png",
@@ -59,7 +67,9 @@ window.FLOW_MANIFEST = {
       "images": [
         "1. SRP.png",
         "2. PDP.png",
-        "3. Room List.png",
+        "3A. Room List.png",
+        "3B. Room Detail.png",
+        "3C. Room Detail Break Down.png",
         "4. BF 1a.png",
         "5. BF 1b.png",
         "6. BF 2.png",
@@ -72,7 +82,9 @@ window.FLOW_MANIFEST = {
       "images": [
         "1. SRP.png",
         "2. PDP.png",
-        "3. Room List.png",
+        "3A. Room List.png",
+        "3B. Room Detail.png",
+        "3C. Room Detail Break Down.png",
         "4. BF 1a.png",
         "5. BF 1b.png",
         "6. BF 2.png",
@@ -86,7 +98,9 @@ window.FLOW_MANIFEST = {
         "1. SRP - Unapplied.png",
         "2. SRP - Applied.png",
         "3. PDP.png",
-        "4. Room List.png",
+        "4A. Room List.png",
+        "4B. Room Detail.png",
+        "4C. Room Detail Break Down.png",
         "5. BF 1a.png",
         "6. BF 1b.png",
         "7. BF 2.png",
@@ -103,12 +117,13 @@ window.FLOW_MANIFEST = {
         "3. Room List B.png",
         "3. Room List C.png",
         "3. Room List D.png",
-        "4. BF 3A.png",
-        "4. BF 3B.png",
-        "5. BF 2-A.png",
-        "6. BF 2-B.png",
+        "3. Room List E.png",
+        "4. BF 1A.png",
+        "4. BF 1B.png",
+        "5. BF 2A.png",
+        "6. BF 2B.png",
         "7. Payment.png",
-        "8. Payment.png"
+        "8. Payment Price Detail.png"
       ]
     },
     {
@@ -121,6 +136,7 @@ window.FLOW_MANIFEST = {
         "4. Room List B.png",
         "4. Room List C.png",
         "4. Room List D.png",
+        "4. Room List E.png",
         "5. BF 1A.png",
         "5. BF 1B.png",
         "6. BF 2-A.png",
@@ -173,6 +189,7 @@ window.FLOW_MANIFEST = {
         "3. Room List B.png",
         "3. Room List C.png",
         "3. Room List D.png",
+        "3. Room List E.png",
         "4. BF 3A.png",
         "4. BF 3B.png",
         "5. BF 2-A.png",
@@ -204,10 +221,11 @@ window.FLOW_MANIFEST = {
         "1. SRP - Unapplied.png",
         "2. SRP - Applied.png",
         "3. PDP.png",
+        "3. Room List C.png",
+        "3. Room List D.png",
         "4. Room List A.png",
         "4. Room List B.png",
-        "4. Room List C.png",
-        "4. Room List D.png",
+        "4. Room List E.png",
         "5. BF 1A.png",
         "5. BF 1B.png",
         "6. BF 2-A.png",
@@ -215,7 +233,25 @@ window.FLOW_MANIFEST = {
         "7. Payment.png",
         "8. Payment.png"
       ]
+    },
+    {
+      "name": "13. Prop Fee Exploration",
+      "images": [
+        "1. BF 1A.png",
+        "1. BF 1B.png",
+        "2. BF 2A.png",
+        "2. BF 2B.png"
+      ]
+    },
+    {
+      "name": "14. Tiket Downpay",
+      "images": [
+        "1. BF.png",
+        "2. Payment.png",
+        "3. Price detail phase 1.png",
+        "3. Price detail phase 2.png"
+      ]
     }
   ],
-  "updatedAt": 1784026612000
+  "updatedAt": 1784865323000
 };
